@@ -523,7 +523,6 @@ resource "aws_iam_role" "config" {
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy_attachment" "config" {
@@ -549,7 +548,6 @@ resource "aws_iam_role" "lambda" {
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy_attachment" "lambda" {
@@ -615,7 +613,6 @@ resource "aws_iam_role" "lambda" {
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy_attachment" "lambda" {
@@ -679,6 +676,7 @@ resource "aws_config_organization_custom_rule" "test" {
 
   input_parameters = <<PARAMS
 %[2]s
+
 PARAMS
 
   lambda_function_arn = aws_lambda_function.test.arn
@@ -693,9 +691,9 @@ func testAccConfigOrganizationCustomRuleConfigLambdaFunctionArn1(rName string) s
 resource "aws_config_organization_custom_rule" "test" {
   depends_on = [aws_config_configuration_recorder.test, aws_lambda_permission.test, aws_organizations_organization.test]
 
-  lambda_function_arn  = aws_lambda_function.test.arn
-  name                 = %[1]q
-  trigger_types        = ["ScheduledNotification"]
+  lambda_function_arn = aws_lambda_function.test.arn
+  name                = %[1]q
+  trigger_types       = ["ScheduledNotification"]
 }
 `, rName)
 }
@@ -705,14 +703,14 @@ func testAccConfigOrganizationCustomRuleConfigLambdaFunctionArn2(rName string) s
 resource "aws_lambda_function" "test2" {
   filename      = "test-fixtures/lambdatest.zip"
   function_name = "%[1]s2"
-  role          = "${aws_iam_role.lambda.arn}"
+  role          = aws_iam_role.lambda.arn
   handler       = "exports.example"
   runtime       = "nodejs12.x"
 }
 
 resource "aws_lambda_permission" "test2" {
   action        = "lambda:InvokeFunction"
-  function_name = "${aws_lambda_function.test2.arn}"
+  function_name = aws_lambda_function.test2.arn
   principal     = "config.amazonaws.com"
   statement_id  = "AllowExecutionFromConfig"
 }
@@ -720,9 +718,9 @@ resource "aws_lambda_permission" "test2" {
 resource "aws_config_organization_custom_rule" "test" {
   depends_on = [aws_config_configuration_recorder.test, aws_lambda_permission.test2, aws_organizations_organization.test]
 
-  lambda_function_arn  = "${aws_lambda_function.test2.arn}"
-  name                 = %[1]q
-  trigger_types        = ["ScheduledNotification"]
+  lambda_function_arn = aws_lambda_function.test2.arn
+  name                = %[1]q
+  trigger_types       = ["ScheduledNotification"]
 }
 `, rName)
 }

@@ -486,7 +486,6 @@ resource "aws_iam_role" "test" {
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy_attachment" "test" {
@@ -506,9 +505,9 @@ func testAccConfigOrganizationManagedRuleConfigDescription(rName, description st
 resource "aws_config_organization_managed_rule" "test" {
   depends_on = [aws_config_configuration_recorder.test, aws_organizations_organization.test]
 
-  description       = %[2]q
-  name              = %[1]q
-  rule_identifier   = "IAM_PASSWORD_POLICY"
+  description     = %[2]q
+  name            = %[1]q
+  rule_identifier = "IAM_PASSWORD_POLICY"
 }
 `, rName, description)
 }
@@ -560,6 +559,7 @@ resource "aws_config_organization_managed_rule" "test" {
 
   input_parameters = <<PARAMS
 %[2]s
+
 PARAMS
 
   name            = %[1]q
@@ -598,7 +598,13 @@ func testAccConfigOrganizationManagedRuleConfigResourceTypesScope1(rName string)
 resource "aws_config_organization_managed_rule" "test" {
   depends_on = [aws_config_configuration_recorder.test, aws_organizations_organization.test]
 
-  input_parameters     = "{\"tag1Key\":\"CostCenter\", \"tag2Key\":\"Owner\"}"
+  input_parameters = <<EOF
+{
+  "tag1Key": "CostCenter",
+  "tag2Key": "Owner"
+}
+EOF
+
   name                 = %[1]q
   resource_types_scope = ["AWS::EC2::Instance"]
   rule_identifier      = "REQUIRED_TAGS"
@@ -611,7 +617,13 @@ func testAccConfigOrganizationManagedRuleConfigResourceTypesScope2(rName string)
 resource "aws_config_organization_managed_rule" "test" {
   depends_on = [aws_config_configuration_recorder.test, aws_organizations_organization.test]
 
-  input_parameters     = "{\"tag1Key\":\"CostCenter\", \"tag2Key\":\"Owner\"}"
+  input_parameters = <<EOF
+{
+  "tag1Key": "CostCenter",
+  "tag2Key": "Owner"
+}
+EOF
+
   name                 = %[1]q
   resource_types_scope = ["AWS::EC2::Instance", "AWS::EC2::VPC"]
   rule_identifier      = "REQUIRED_TAGS"

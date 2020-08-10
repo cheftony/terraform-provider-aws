@@ -2087,7 +2087,6 @@ func TestAWSCodeDeployDeploymentGroup_alarmConfigToMap(t *testing.T) {
 
 func testAccCheckCodeDeployDeploymentGroupTriggerEvents(group *codedeploy.DeploymentGroupInfo, triggerName string, expectedEvents []string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
-
 		found := false
 		for _, actual := range group.TriggerConfigurations {
 			if *actual.TriggerName == triggerName {
@@ -2238,21 +2237,25 @@ func testAccAWSCodeDeployDeploymentGroupImportStateIdFunc(resourceName string) r
 func testAccAWSCodeDeployDeploymentGroup(rName string, tagGroup bool) string {
 	var tagGroupOrFilter string
 	if tagGroup {
-		tagGroupOrFilter = `ec2_tag_set {
-    ec2_tag_filter {
-      key   = "filterkey"
-      type  = "KEY_AND_VALUE"
-      value = "filtervalue"
-    }
-  }
-`
-	} else {
-		tagGroupOrFilter = `ec2_tag_filter {
+		tagGroupOrFilter = `
+ec2_tag_set {
+  ec2_tag_filter {
     key   = "filterkey"
     type  = "KEY_AND_VALUE"
     value = "filtervalue"
   }
+}
 `
+
+	} else {
+		tagGroupOrFilter = `
+ec2_tag_filter {
+  key   = "filterkey"
+  type  = "KEY_AND_VALUE"
+  value = "filtervalue"
+}
+`
+
 	}
 
 	return fmt.Sprintf(`
@@ -2268,8 +2271,9 @@ resource "aws_codedeploy_app" "test" {
 }
 
 resource "aws_iam_role_policy" "test" {
-  name   = "tf-acc-test-%[1]s"
-  role   = aws_iam_role.test.id
+  name = "tf-acc-test-%[1]s"
+  role = aws_iam_role.test.id
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2293,11 +2297,11 @@ resource "aws_iam_role_policy" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role" "test" {
-  name               = "tf-acc-test-%[1]s"
+  name = "tf-acc-test-%[1]s"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2315,7 +2319,6 @@ resource "aws_iam_role" "test" {
   ]
 }
 EOF
-
 }
 `, rName, tagGroupOrFilter)
 }
@@ -2323,21 +2326,25 @@ EOF
 func testAccAWSCodeDeployDeploymentGroupModified(rName string, tagGroup bool) string {
 	var tagGroupOrFilter string
 	if tagGroup {
-		tagGroupOrFilter = `ec2_tag_set {
-    ec2_tag_filter {
-      key   = "filterkey"
-      type  = "KEY_AND_VALUE"
-      value = "anotherfiltervalue"
-    }
-  }
-`
-	} else {
-		tagGroupOrFilter = `ec2_tag_filter {
+		tagGroupOrFilter = `
+ec2_tag_set {
+  ec2_tag_filter {
     key   = "filterkey"
     type  = "KEY_AND_VALUE"
     value = "anotherfiltervalue"
   }
+}
 `
+
+	} else {
+		tagGroupOrFilter = `
+ec2_tag_filter {
+  key   = "filterkey"
+  type  = "KEY_AND_VALUE"
+  value = "anotherfiltervalue"
+}
+`
+
 	}
 
 	return fmt.Sprintf(`
@@ -2353,8 +2360,9 @@ resource "aws_codedeploy_app" "test" {
 }
 
 resource "aws_iam_role_policy" "test" {
-  name   = "tf-acc-test-%[1]s"
-  role   = aws_iam_role.test_updated.id
+  name = "tf-acc-test-%[1]s"
+  role = aws_iam_role.test_updated.id
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2378,11 +2386,11 @@ resource "aws_iam_role_policy" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role" "test_updated" {
-  name               = "tf-acc-test-updated-%[1]s"
+  name = "tf-acc-test-updated-%[1]s"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2400,7 +2408,6 @@ resource "aws_iam_role" "test_updated" {
   ]
 }
 EOF
-
 }
 `, rName, tagGroupOrFilter)
 }
@@ -2412,8 +2419,9 @@ resource "aws_codedeploy_app" "test" {
 }
 
 resource "aws_iam_role_policy" "test" {
-  name   = "tf-acc-test-%[1]s"
-  role   = aws_iam_role.test.id
+  name = "tf-acc-test-%[1]s"
+  role = aws_iam_role.test.id
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2437,11 +2445,11 @@ resource "aws_iam_role_policy" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role" "test" {
-  name               = "tf-acc-test-%[1]s"
+  name = "tf-acc-test-%[1]s"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2459,7 +2467,6 @@ resource "aws_iam_role" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_codedeploy_deployment_group" "test" {
@@ -2483,8 +2490,9 @@ resource "aws_codedeploy_app" "test" {
 }
 
 resource "aws_iam_role_policy" "test" {
-  name   = "tf-acc-test-%[1]s"
-  role   = aws_iam_role.test.id
+  name = "tf-acc-test-%[1]s"
+  role = aws_iam_role.test.id
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2510,11 +2518,11 @@ resource "aws_iam_role_policy" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role" "test" {
-  name               = "tf-acc-test-%[1]s"
+  name = "tf-acc-test-%[1]s"
+
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -2530,7 +2538,6 @@ resource "aws_iam_role" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_sns_topic" "test" {
@@ -2979,6 +2986,7 @@ data "aws_ami" "amzn-ami-minimal-hvm-ebs" {
     name   = "name"
     values = ["amzn-ami-minimal-hvm-*"]
   }
+
   filter {
     name   = "root-device-type"
     values = ["ebs"]
@@ -3070,6 +3078,7 @@ data "aws_ami" "amzn-ami-minimal-hvm-ebs" {
     name   = "name"
     values = ["amzn-ami-minimal-hvm-*"]
   }
+
   filter {
     name   = "root-device-type"
     values = ["ebs"]
@@ -3365,7 +3374,6 @@ resource "aws_ecs_task_definition" "test" {
   }
 ]
 DEFINITION
-
 }
 
 resource "aws_ecs_service" "test" {
@@ -3409,13 +3417,14 @@ resource "aws_iam_role" "test" {
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": ["codedeploy.amazonaws.com"]
+        "Service": [
+          "codedeploy.amazonaws.com"
+        ]
       }
     }
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy" "test" {
@@ -3449,7 +3458,6 @@ resource "aws_iam_role_policy" "test" {
   ]
 }
 POLICY
-
 }
 `, rName)
 }

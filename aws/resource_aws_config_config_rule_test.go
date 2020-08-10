@@ -377,7 +377,6 @@ resource "aws_iam_role" "test" {
   ]
 }
 EOF
-
 }
 
 resource "aws_iam_role_policy_attachment" "test" {
@@ -399,7 +398,6 @@ resource "aws_config_config_rule" "test" {
 
   depends_on = [aws_config_configuration_recorder.test]
 }
-
 `, rName)
 }
 
@@ -420,12 +418,14 @@ resource "aws_config_config_rule" "test" {
   }
 
   input_parameters = <<PARAMS
-{"tag1Key":"CostCenter", "tag2Key":"Owner"}
+{
+  "tag1Key": "CostCenter",
+  "tag2Key": "Owner"
+}
 PARAMS
 
   depends_on = [aws_config_configuration_recorder.test]
 }
-
 `, rName)
 }
 
@@ -490,7 +490,6 @@ resource "aws_iam_role" "iam_for_lambda" {
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy_attachment" "a" {
@@ -537,7 +536,6 @@ resource "aws_iam_role" "r" {
   ]
 }
 POLICY
-
 }
 
 resource "aws_iam_role_policy" "p" {
@@ -569,7 +567,6 @@ resource "aws_iam_role_policy" "p" {
   ]
 }
 POLICY
-
 }
 `, randInt, path, randInt, randInt, randInt, randInt, randInt, randInt, randInt)
 }
@@ -584,7 +581,7 @@ resource "aws_config_config_rule" "test" {
   }
 
   source {
-    owner = "AWS"
+    owner             = "AWS"
     source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
   }
 
@@ -604,7 +601,7 @@ resource "aws_config_config_rule" "test" {
   }
 
   source {
-    owner = "AWS"
+    owner             = "AWS"
     source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
   }
 
@@ -619,14 +616,14 @@ resource "aws_config_config_rule" "test" {
   name = %[1]q
 
   source {
-    owner = "AWS"
+    owner             = "AWS"
     source_identifier = "S3_BUCKET_VERSIONING_ENABLED"
   }
 
   tags = {
-	Name  = %[1]q
-	%[2]s = %[3]q
-	%[4]s = %[5]q
+    Name        = %[1]q
+    %[2]s = %[3]q
+    %[4]s = %[5]q
   }
 
   depends_on = [aws_config_configuration_recorder.test]
