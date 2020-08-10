@@ -10481,7 +10481,9 @@ func (c *Glue) ResumeWorkflowRunRequest(input *ResumeWorkflowRunInput) (req *req
 
 // ResumeWorkflowRun API operation for AWS Glue.
 //
-// Restarts any completed nodes in a workflow run and resumes the run execution.
+// Restarts selected nodes of a previous partially completed workflow run and
+// resumes the workflow run. The selected nodes and all nodes that are downstream
+// from the selected nodes are run.
 //
 // Returns awserr.Error for service API and SDK errors. Use runtime type assertions
 // with awserr.Error's Code and Message methods to get detailed information about
@@ -16097,8 +16099,9 @@ type Condition struct {
 	// A logical operator.
 	LogicalOperator *string `type:"string" enum:"LogicalOperator"`
 
-	// The condition state. Currently, the values supported are SUCCEEDED, STOPPED,
-	// TIMEOUT, and FAILED.
+	// The condition state. Currently, the only job states that a trigger can listen
+	// for are SUCCEEDED, STOPPED, FAILED, and TIMEOUT. The only crawler states
+	// that a trigger can listen for are SUCCEEDED, FAILED, and CANCELLED.
 	State *string `type:"string" enum:"JobRunState"`
 }
 
@@ -16458,6 +16461,9 @@ type ConnectionInput struct {
 	//    * KAFKA - Designates a connection to an Apache Kafka streaming platform.
 	//
 	//    * MONGODB - Designates a connection to a MongoDB document database.
+	//
+	//    * NETWORK - Designates a network connection to a data source within an
+	//    Amazon Virtual Private Cloud environment (Amazon VPC).
 	//
 	// SFTP is not supported.
 	//
@@ -19573,6 +19579,12 @@ type CreateWorkflowInput struct {
 	// A description of the workflow.
 	Description *string `type:"string"`
 
+	// You can use this parameter to prevent unwanted multiple updates to data,
+	// to control costs, or in some cases, to prevent exceeding the maximum number
+	// of concurrent runs of any of the component jobs. If you leave this parameter
+	// blank, there is no limit to the number of concurrent workflow runs.
+	MaxConcurrentRuns *int64 `type:"integer"`
+
 	// The name to be assigned to the workflow. It should be unique within your
 	// account.
 	//
@@ -19618,6 +19630,12 @@ func (s *CreateWorkflowInput) SetDefaultRunProperties(v map[string]*string) *Cre
 // SetDescription sets the Description field's value.
 func (s *CreateWorkflowInput) SetDescription(v string) *CreateWorkflowInput {
 	s.Description = &v
+	return s
+}
+
+// SetMaxConcurrentRuns sets the MaxConcurrentRuns field's value.
+func (s *CreateWorkflowInput) SetMaxConcurrentRuns(v int64) *CreateWorkflowInput {
+	s.MaxConcurrentRuns = &v
 	return s
 }
 
@@ -28199,7 +28217,8 @@ type JobRun struct {
 	// The name of the job definition being used in this run.
 	JobName *string `min:"1" type:"string"`
 
-	// The current state of the job run.
+	// The current state of the job run. For more information about the statuses
+	// of jobs that have terminated abnormally, see AWS Glue Job Run Statuses (https://docs.aws.amazon.com/glue/latest/dg/job-run-statuses.html).
 	JobRunState *string `type:"string" enum:"JobRunState"`
 
 	// The last time that this job run was modified.
@@ -31143,7 +31162,7 @@ type ResumeWorkflowRunInput struct {
 	Name *string `min:"1" type:"string" required:"true"`
 
 	// A list of the node IDs for the nodes you want to restart. The nodes that
-	// are to be restarted must have an execution attempt in the original run.
+	// are to be restarted must have a run attempt in the original run.
 	//
 	// NodeIds is a required field
 	NodeIds []*string `type:"list" required:"true"`
@@ -31277,6 +31296,10 @@ func (s *S3Encryption) SetS3EncryptionMode(v string) *S3Encryption {
 type S3Target struct {
 	_ struct{} `type:"structure"`
 
+	// The name of a connection which allows a job or crawler to access data in
+	// Amazon S3 within an Amazon Virtual Private Cloud environment (Amazon VPC).
+	ConnectionName *string `type:"string"`
+
 	// A list of glob patterns used to exclude from the crawl. For more information,
 	// see Catalog Tables with a Crawler (https://docs.aws.amazon.com/glue/latest/dg/add-crawler.html).
 	Exclusions []*string `type:"list"`
@@ -31293,6 +31316,12 @@ func (s S3Target) String() string {
 // GoString returns the string representation
 func (s S3Target) GoString() string {
 	return s.String()
+}
+
+// SetConnectionName sets the ConnectionName field's value.
+func (s *S3Target) SetConnectionName(v string) *S3Target {
+	s.ConnectionName = &v
+	return s
 }
 
 // SetExclusions sets the Exclusions field's value.
@@ -36529,6 +36558,12 @@ type UpdateWorkflowInput struct {
 	// The description of the workflow.
 	Description *string `type:"string"`
 
+	// You can use this parameter to prevent unwanted multiple updates to data,
+	// to control costs, or in some cases, to prevent exceeding the maximum number
+	// of concurrent runs of any of the component jobs. If you leave this parameter
+	// blank, there is no limit to the number of concurrent workflow runs.
+	MaxConcurrentRuns *int64 `type:"integer"`
+
 	// Name of the workflow to be updated.
 	//
 	// Name is a required field
@@ -36570,6 +36605,12 @@ func (s *UpdateWorkflowInput) SetDefaultRunProperties(v map[string]*string) *Upd
 // SetDescription sets the Description field's value.
 func (s *UpdateWorkflowInput) SetDescription(v string) *UpdateWorkflowInput {
 	s.Description = &v
+	return s
+}
+
+// SetMaxConcurrentRuns sets the MaxConcurrentRuns field's value.
+func (s *UpdateWorkflowInput) SetMaxConcurrentRuns(v int64) *UpdateWorkflowInput {
+	s.MaxConcurrentRuns = &v
 	return s
 }
 
@@ -36980,6 +37021,12 @@ type Workflow struct {
 	// The information about the last execution of the workflow.
 	LastRun *WorkflowRun `type:"structure"`
 
+	// You can use this parameter to prevent unwanted multiple updates to data,
+	// to control costs, or in some cases, to prevent exceeding the maximum number
+	// of concurrent runs of any of the component jobs. If you leave this parameter
+	// blank, there is no limit to the number of concurrent workflow runs.
+	MaxConcurrentRuns *int64 `type:"integer"`
+
 	// The name of the workflow representing the flow.
 	Name *string `min:"1" type:"string"`
 }
@@ -37027,6 +37074,12 @@ func (s *Workflow) SetLastModifiedOn(v time.Time) *Workflow {
 // SetLastRun sets the LastRun field's value.
 func (s *Workflow) SetLastRun(v *WorkflowRun) *Workflow {
 	s.LastRun = v
+	return s
+}
+
+// SetMaxConcurrentRuns sets the MaxConcurrentRuns field's value.
+func (s *Workflow) SetMaxConcurrentRuns(v int64) *Workflow {
+	s.MaxConcurrentRuns = &v
 	return s
 }
 
@@ -37080,6 +37133,11 @@ type WorkflowRun struct {
 	// The date and time when the workflow run completed.
 	CompletedOn *time.Time `type:"timestamp"`
 
+	// This error message describes any error that may have occurred in starting
+	// the workflow run. Currently the only error message is "Concurrent runs exceeded
+	// for workflow: foo."
+	ErrorMessage *string `type:"string"`
+
 	// The graph representing all the AWS Glue components that belong to the workflow
 	// as nodes and directed connections between them as edges.
 	Graph *WorkflowGraph `type:"structure"`
@@ -37119,6 +37177,12 @@ func (s WorkflowRun) GoString() string {
 // SetCompletedOn sets the CompletedOn field's value.
 func (s *WorkflowRun) SetCompletedOn(v time.Time) *WorkflowRun {
 	s.CompletedOn = &v
+	return s
+}
+
+// SetErrorMessage sets the ErrorMessage field's value.
+func (s *WorkflowRun) SetErrorMessage(v string) *WorkflowRun {
+	s.ErrorMessage = &v
 	return s
 }
 
@@ -37449,6 +37513,9 @@ const (
 
 	// ConnectionTypeKafka is a ConnectionType enum value
 	ConnectionTypeKafka = "KAFKA"
+
+	// ConnectionTypeNetwork is a ConnectionType enum value
+	ConnectionTypeNetwork = "NETWORK"
 )
 
 const (
@@ -37843,4 +37910,7 @@ const (
 
 	// WorkflowRunStatusStopped is a WorkflowRunStatus enum value
 	WorkflowRunStatusStopped = "STOPPED"
+
+	// WorkflowRunStatusError is a WorkflowRunStatus enum value
+	WorkflowRunStatusError = "ERROR"
 )
